@@ -1,0 +1,93 @@
+
+%initialEst = quatToRotMat(camStates{1}.q_CG)'*p_f1_1_bar + camStates{1}.p_C_G;
+
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% xBar = p_f1_1_bar(1);
+% yBar = p_f1_1_bar(2);
+% zBar = p_f1_1_bar(3);
+% 
+% alphaBar = xBar/zBar;
+% betaBar = yBar/zBar;
+% rhoBar = 1/zBar;
+% % disp(zBar);
+% 
+% xEst = [alphaBar; betaBar; rhoBar];
+% 
+% Cnum = length(camState);
+% 
+% %Optimize
+% maxIter = 50;
+% Jprev = Inf;
+% 
+% for optI = 1:maxIter
+%     %optI
+%     E = zeros(2*Cnum, 3);
+%     W = zeros(2*Cnum, 2*Cnum);
+%     errorVec = zeros(2*Cnum, 1);
+% 
+%     for iState = 1:Cnum
+%         %Form the weight matrix
+%         m = diag([noiseParams.u_var_prime noiseParams.v_var_prime]);
+%         W((2*iState - 1):(2*iState),(2*iState - 1):(2*iState)) = m;
+%         a = quatToRotMat(camState{iState}.q_CG);
+%         beta = (quatToRotMat(camState{1}.q_CG)');
+%         C_i1 = a*beta;
+%         fT = quatToRotMat(camState{iState}.q_CG);
+%         t_1i_i = fT*(camState{1}.p_C_G - camState{iState}.p_C_G);
+%         
+% 
+%         %Form the error vector
+%         zHat = observations(:, iState);
+%         alphaMat = C_i1*[alphaBar; betaBar; 1];
+%         h = alphaMat + rhoBar*t_1i_i;
+% %         disp(rhoBar);
+%         diff = zHat - [h(1); h(2)]/h(3);
+%         errorVec((2*iState - 1):(2*iState),1) = diff;
+% 
+% 
+%         %Form the Jacobian
+%         dEdalpha = [-C_i1(1,1)/h(3) + (h(1)/h(3)^2)*C_i1(3,1); ...
+%                     -C_i1(2,1)/h(3) + (h(2)/h(3)^2)*C_i1(3,1)];
+% 
+%         dEdbeta =  [-C_i1(1,2)/h(3) + (h(1)/h(3)^2)*C_i1(3,2); ...
+%                     -C_i1(2,2)/h(3) + (h(2)/h(3)^2)*C_i1(3,2)];
+% 
+%         dEdrho =   [-t_1i_i(1)/h(3) + (h(1)/h(3)^2)*t_1i_i(3); ...
+%                     -t_1i_i(2)/h(3) + (h(2)/h(3)^2)*t_1i_i(3)];
+% 
+%         Eblock = [dEdalpha dEdbeta dEdrho];
+%         E((2*iState - 1):(2*iState), :) = Eblock;
+%     end
+% 
+%     %Calculate the cost function
+%     Jnew = 0.5*errorVec'*(W\errorVec);
+%     %Solve!
+%     xp = W\E;
+%     EWE = E'*(xp);
+%     RCOND = rcond(EWE);
+%     dx_star =  (EWE)\(-E'*(W\errorVec)); 
+%     
+%     xEst = xEst + dx_star;
+%     
+%     Jderiv = abs((Jnew - Jprev)/Jnew);
+%     
+%     Jprev = Jnew;
+% %     disp(Jnew);
+% 
+%     if Jderiv < 0.01
+%         break;
+%     else
+%         alphaBar = xEst(1);
+%         betaBar = xEst(2);
+%         rhoBar = xEst(3);
+%     end
+%     
+% end
+% 
+% first = [xEst(1:2); 1];
+% second = quatToRotMat(camState{1}.q_CG)'*first;
+% third = camState{1}.p_C_G;
+% 
+% p_f_G = (1/xEst(3))*second + third;
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

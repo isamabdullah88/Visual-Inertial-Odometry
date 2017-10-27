@@ -1,0 +1,47 @@
+function [ noiseParams, camera ] = setNoiseParams(C_c_v, rho_v_c_v)
+%setNoiseParams sets all the noise parameters like white noise and camera
+%parameters
+
+% % %## IMU
+par1 = 1.00e-3;
+par2 = 1.00e-6;
+q_var = par1 * ones(1,3);               % rot vel var
+a_var = par1 * ones(1,3);               % lin vel var
+dbq_var = par2 * ones(1,3);            % gyro bias change var
+dba_var = par2 * ones(1,3);            % vel bias change var
+
+
+%%%% MAV ETH DATASET %%%%
+% q_var = 1.6968e-0 * ones(1,3);               % rot vel var
+% a_var = 2.0000e-0 * ones(1,3);               % lin vel var
+% dbq_var = 1.9393e-00 * ones(1,3);            % gyro bias change var
+% dba_var = 3.0000e-0 * ones(1,3);            % vel bias change var
+noiseParams.Q_imu = diag([q_var, dbq_var, a_var, dba_var]);
+
+%## CAMERA
+%Set up the camera parameters
+camera.c_u      = 609.5593;                   % Principal point [u pixels]
+camera.c_v      = 172.8540;                   % Principal point [v pixels]
+camera.f_u      = 721.5377;                   % Focal length [u pixels]
+camera.f_v      = 721.5377;                   % Focal length [v pixels]
+camera.q_CI     = rotMatToQuat(C_c_v);  % 4x1 IMU-to-Camera rotation quaternion
+camera.p_C_I    = rho_v_c_v;            % 3x1 Camera position in IMU frame
+
+% %%% MAV DATASET %%%
+% camera.c_u      = 367.215;                   % Principal point [u pixels]
+% camera.c_v      = 248.375;                   % Principal point [v pixels]
+% camera.f_u      = 458.654;                   % Focal length [u pixels]
+% camera.f_v      = 457.296;                   % Focal length [v pixels]
+% camera.q_CI     = [0.00666398307551; -0.0079168224269; -0.701985972528; 0.712115587266];  % 4x1 IMU-to-Camera rotation quaternion
+% camera.p_C_I    = [-0.0111674199187; -0.0574640920022; 0.0207586947896];            % 3x1 Camera position in IMU frame
+% 
+% 
+
+%% Best at 800
+y_var = 3^2 * ones(1,2);               % pixel coord var
+noiseParams.u_var_prime = y_var(1)/camera.f_u^2;
+noiseParams.v_var_prime = y_var(2)/camera.f_v^2;
+
+
+end
+
