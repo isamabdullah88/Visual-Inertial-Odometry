@@ -11,4 +11,4 @@ Read the paper at: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.437.
 - This inconsistency is discussed in detail in the report, which can be furnished on request.
 - Source code can be found in the SourceCode section.
 
-Please let me know in the issues, if you need to know anything.
+Please let me know in the issues, if you come across problems.
