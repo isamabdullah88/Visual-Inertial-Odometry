@@ -1,3 +1,0 @@
-1) Only static case is treated.
-2) Features are not tracked to go out of view.
-3) State is corrected after regular number of camera Poses.

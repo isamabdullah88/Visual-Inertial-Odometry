@@ -1,4 +1,4 @@
-function[p_f_G, Jnew, RCOND] = calcGNPosEst(camStates, observations, noiseParams)
+function[p_f_G, Jderiv, RCOND] = calcGNPosEst(camStates, observations, trackRange)
 %CALCGNPOSEST Calculate the position estimate of the feature using Gauss
 %Newton optimization
 %   INPUT :
@@ -15,12 +15,13 @@ function[p_f_G, Jnew, RCOND] = calcGNPosEst(camStates, observations, noiseParams
 
 %Get initial estimate through intersection
 %Use the first 2 camStates
-secondViewIdx = length(camStates);
+firstViewInd = trackRange(1);
+secondViewInd = trackRange(2);
 
-C_12 = quatToRotMat(camStates{1}.q_CG) * quatToRotMat(camStates{secondViewIdx}.q_CG)';
-t_21_1 = quatToRotMat(camStates{1}.q_CG) * (camStates{secondViewIdx}.p_C_G - camStates{1}.p_C_G);
+C_12 = quatToRotMat(camStates{firstViewInd}.q_CG) * quatToRotMat(camStates{secondViewInd}.q_CG)';
+t_21_1 = quatToRotMat(camStates{firstViewInd}.q_CG) * (camStates{secondViewInd}.p_C_G - camStates{firstViewInd}.p_C_G);
 
-p_f1_1_bar = triangulate(observations( :, 1), observations( : , secondViewIdx), C_12, t_21_1);
+p_f1_1_bar = triangulate(observations( :, 1), observations( : , secondViewInd), C_12, t_21_1);
 
 %initialEst = quatToRotMat(camStates{1}.q_CG)' * p_f1_1_bar + camStates{1}.p_C_G;
 
@@ -38,7 +39,7 @@ xEst =[alphaBar; betaBar; rhoBar];
 Cnum = length(camStates);
 
 %Optimize
-maxIter = 100;
+maxIter = 15;
 Jprev = Inf;
 
 for optI = 1 : maxIter
@@ -49,10 +50,10 @@ residual = zeros(2 * Cnum, 1);
 
 for iState = 1 : Cnum
 %Form the weight matrix
-W((2 * iState - 1) : (2 * iState), (2 * iState - 1) : (2 * iState)) = diag([noiseParams.u_var_prime noiseParams.v_var_prime]);
+%         W((2 * iState - 1) : (2 * iState), (2 * iState - 1) : (2 * iState)) = diag([noiseParams.u_var_prime noiseParams.v_var_prime]);
 
-C_i1 = quatToRotMat(camStates{iState}.q_CG) * (quatToRotMat(camStates{1}.q_CG)');
-t_1i_i = -quatToRotMat(camStates{iState}.q_CG) * (camStates{iState}.p_C_G - camStates{1}.p_C_G);
+C_i1 = quatToRotMat(camStates{iState}.q_CG) * (quatToRotMat(camStates{firstViewInd}.q_CG)');
+t_1i_i = -quatToRotMat(camStates{iState}.q_CG) * (camStates{iState}.p_C_G - camStates{firstViewInd}.p_C_G);
 
 
 %Form the error vector
@@ -100,7 +101,7 @@ end
 
 end
 
-p_f_G = (1 / xEst(3)) * quatToRotMat(camStates{1}.q_CG)' *[xEst(1 : 2); 1]+ camStates{1}.p_C_G;
+p_f_G = (1 / xEst(3)) * quatToRotMat(camStates{firstViewInd}.q_CG)' *[xEst(1 : 2); 1]+ camStates{firstViewInd}.p_C_G;
 
 
 function[p_f1_1] = triangulate(obs1, obs2, C_12, t_21_1)

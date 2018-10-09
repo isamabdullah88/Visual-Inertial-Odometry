@@ -1,0 +1,9 @@
+1) Only static case is treated.
+2) Features are not tracked to go out of view.
+3) State is corrected after regular number of camera Poses.
+
+The velocities given in the dataset must have been integrated with better accuracy within. There is a huge drift in the integrated velocity in comparison to the velocity in the dataset.
+Also, the major difference between the integrated positions was due to the fact that the vehicle in the dataset had initial velocity which was considered zero in integration.
+The battle of filters paper was not able to truly correct because they treated velocity as with the random noise, but was not.
+
+At no of points of extraction = 60, it gives good result, but as I increase the no of points, it bumps to 70 in y?
