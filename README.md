@@ -10,5 +10,6 @@ Read the paper at: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.437.
 - The current approach taken in the paper lacks an important statistical inconsistency.
 - This inconsistency is discussed in detail in the report, which can be furnished on request.
 - Source code can be found in the SourceCode section.
+- Please read my paper for more details on this at: https://drive.google.com/file/d/1-74SceO-TyT5X8ZBAJuMfoVjEMNUMSc6/view?usp=sharing
 
 Please let me know in the issues, if you come across problems.
